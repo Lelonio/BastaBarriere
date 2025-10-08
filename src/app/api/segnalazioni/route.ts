@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
   try {
+    // Per le richieste GET, permettiamo accesso pubblico (sola lettura)
+    // ma se c'è un token admin, lo verifichiamo
+    const authHeader = request.headers.get('authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      if (!isAdminAuthenticated(request)) {
+        return NextResponse.json(
+          { error: 'Token non valido' },
+          { status: 401 }
+        )
+      }
+    }
+
     const { searchParams } = new URL(request.url)
     const tipo = searchParams.get('tipo')
     const stato = searchParams.get('stato')
