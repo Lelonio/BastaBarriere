@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./db/custom.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -49,4 +49,11 @@ model Segnalazione {
   valutazioniNonPertinenti Int @default(0)  // Numero di valutazioni negative
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  // Indici per performance
+  @@index([tipo])
+  @@index([stato])
+  @@index([gravita])
+  @@index([createdAt])
+  @@index([lat, lng])
 }
