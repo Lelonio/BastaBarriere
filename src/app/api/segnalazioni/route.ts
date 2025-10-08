@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db, prismaWithRetry } from '@/lib/db'
 import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
@@ -30,11 +30,14 @@ export async function GET(request: NextRequest) {
       whereClause = { ...whereClause, stato }
     }
     
-    const segnalazioni = await db.segnalazione.findMany({
-      where: whereClause,
-      orderBy: {
-        createdAt: 'desc'
-      }
+    // Usa prismaWithRetry per gestire prepared statements
+    const segnalazioni = await prismaWithRetry(async () => {
+      return db.segnalazione.findMany({
+        where: whereClause,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
     })
     
     return NextResponse.json(segnalazioni)
@@ -72,20 +75,23 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const segnalazione = await db.segnalazione.create({
-      data: {
-        tipo,
-        titolo,
-        descrizione,
-        indirizzo,
-        gravita,
-        lat,
-        lng,
-        fotoUrl,
-        nomeSegnalante,
-        emailSegnalante,
-        telefonoSegnalante
-      }
+    // Usa prismaWithRetry per gestire prepared statements
+    const segnalazione = await prismaWithRetry(async () => {
+      return db.segnalazione.create({
+        data: {
+          tipo,
+          titolo,
+          descrizione,
+          indirizzo,
+          gravita,
+          lat,
+          lng,
+          fotoUrl,
+          nomeSegnalante,
+          emailSegnalante,
+          telefonoSegnalante
+        }
+      })
     })
     
     return NextResponse.json(segnalazione, { status: 201 })
