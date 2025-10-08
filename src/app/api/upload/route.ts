@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,39 +20,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verifica dimensione massima (5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Verifica dimensione massima (3MB per base64 - più piccolo del precedente)
+    if (file.size > 3 * 1024 * 1024) {
       return NextResponse.json(
-        { error: 'L\'immagine non può superare i 5MB' },
+        { error: 'L\'immagine non può superare i 3MB' },
         { status: 400 }
       )
     }
 
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    
+    // Converti in base64
+    const base64String = buffer.toString('base64')
+    
+    // Crea il data URL completo
+    const dataUrl = `data:${file.type};base64,${base64String}`
 
-    // Crea la directory uploads se non esiste
-    const uploadsDir = join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-    }
-
-    // Genera un nome file unico
+    // Genera un ID unico per il file
     const timestamp = Date.now()
     const randomString = Math.random().toString(36).substring(2, 8)
-    const fileName = `${timestamp}_${randomString}_${file.name}`
-    const filePath = join(uploadsDir, fileName)
-
-    // Salva il file
-    await writeFile(filePath, buffer)
-
-    // Restituisci l'URL pubblico
-    const fileUrl = `/uploads/${fileName}`
+    const fileId = `${timestamp}_${randomString}`
 
     return NextResponse.json({
       success: true,
-      fileUrl,
-      fileName,
+      fileUrl: dataUrl,
+      fileId,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
       message: 'File caricato con successo'
     })
 
