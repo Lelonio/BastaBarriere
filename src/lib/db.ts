@@ -7,7 +7,20 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: ['query'],
+    log: process.env.NODE_ENV === 'development' ? ['query'] : [],
+    // Ottimizzazioni per PostgreSQL e Vercel
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+    // Configurazione connection pooling per production
+    ...(process.env.NODE_ENV === 'production' && {
+      transactionOptions: {
+        timeout: 10000,
+        isolationLevel: 'ReadCommitted',
+      },
+    }),
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
