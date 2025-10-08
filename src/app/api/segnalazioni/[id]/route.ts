@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Per le richieste GET, permettiamo accesso pubblico (sola lettura)
+    // ma se c'è un token admin, lo verifichiamo
+    const authHeader = request.headers.get('authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      if (!isAdminAuthenticated(request)) {
+        return NextResponse.json(
+          { error: 'Token non valido' },
+          { status: 401 }
+        )
+      }
+    }
+
     const segnalazione = await db.segnalazione.findUnique({
       where: {
         id: params.id
@@ -34,6 +47,14 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // PATCH richiede autenticazione admin
+    if (!isAdminAuthenticated(request)) {
+      return NextResponse.json(
+        { error: 'Non autorizzato' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { stato } = body
     
@@ -68,24 +89,27 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const segnalazione = await db.segnalazione.findUnique({
+    // DELETE richiede autenticazione admin
+    if (!isAdminAuthenticated(request)) {
+      return NextResponse.json(
+        { error: 'Non autorizzato' },
+        { status: 401 }
+      )
+    }
+
+    // Usa deleteMany che ritorna il conteggio invece di findUnique + delete
+    const result = await db.segnalazione.deleteMany({
       where: {
         id: params.id
       }
     })
     
-    if (!segnalazione) {
+    if (result.count === 0) {
       return NextResponse.json(
         { error: 'Segnalazione non trovata' },
         { status: 404 }
       )
     }
-    
-    await db.segnalazione.delete({
-      where: {
-        id: params.id
-      }
-    })
     
     return NextResponse.json({ message: 'Segnalazione eliminata con successo' })
   } catch (error) {
