@@ -1,6 +1,6 @@
 # 🏛️ BastaBarriere
 
-App di segnalazione buche e barriere architettoniche per la città di Civitavecchia. Un'app moderna, accattivante e funzionale per rendere la città più sicura e accessibile.
+App di segnalazione buche e barriere architettoniche per la città di Civitavecchia. Un'app creata per rendere la città più sicura e accessibile.
 
 ## 🎯 Caratteristiche Principali
 
