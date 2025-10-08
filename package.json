@@ -11,7 +11,9 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "migrate:analyze": "node scripts/migrate-to-supabase.js",
+    "supabase:setup": "npm run db:generate && npm run migrate:analyze"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -48,6 +50,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@reactuses/core": "^6.0.5",
+    "@supabase/supabase-js": "^2.74.0",
     "@tanstack/react-query": "^5.82.0",
     "@tanstack/react-table": "^8.21.3",
     "@types/jsonwebtoken": "^9.0.10",
