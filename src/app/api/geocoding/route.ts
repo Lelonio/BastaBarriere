@@ -77,64 +77,79 @@ export async function GET(request: NextRequest) {
 // Funzione helper per tentare il geocoding
 async function tryGeocoding(query: string) {
   try {
-    // Usa Nominatim con parametri più specifici
-    const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=it&countrycodes=it&addressdetails=1`
+    // Prova diverse strategie di ricerca
+    const strategies = [
+      // Strategia 1: Query originale
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=it&countrycodes=it&addressdetails=1`,
+      // Strategia 2: Senza "Cisterna Faro" nella query
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query.replace(/Cisterna Faro,/gi, '').trim())}&limit=5&accept-language=it&countrycodes=it&addressdetails=1`,
+      // Strategia 3: Solo nome via + Civitavecchia
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query.split(',')[0] + ', Civitavecchia, RM, Italia')}&limit=5&accept-language=it&countrycodes=it&addressdetails=1`
+    ]
     
-    const response = await fetch(geocodingUrl, {
-      headers: {
-        'User-Agent': 'BastaBarriere/1.0 (geocoding service)'
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error(`Geocoding service error: ${response.status}`)
-    }
-    
-    const data = await response.json()
-    
-    if (!data || data.length === 0) {
-      return { success: false, error: 'Nessun risultato' }
-    }
-    
-    // Cerca il risultato più rilevante per Civitavecchia
     let bestResult = null
     let bestScore = 0
     
-    for (const result of data) {
-      const displayName = result.display_name || ''
-      const addressParts = result.address || {}
-      
-      // Calcola un punteggio di rilevanza
-      let score = 0
-      
-      // Priorità alta se contiene Civitavecchia
-      if (displayName.toLowerCase().includes('civitavecchia')) {
-        score += 100
-      }
-      
-      // Priorità alta se la città è Civitavecchia
-      if (addressParts.city?.toLowerCase() === 'civitavecchia') {
-        score += 80
-      }
-      
-      // Priorità media se è in provincia di Roma
-      if (addressParts.state === 'Lazio' || addressParts.county?.includes('Roma')) {
-        score += 20
-      }
-      
-      // Evita risultati che contengono "Cisterna Faro" come località principale
-      if (displayName.includes('Cisterna Faro') && !displayName.includes('Civitavecchia')) {
-        score -= 50
-      }
-      
-      if (score > bestScore) {
-        bestScore = score
-        bestResult = result
+    for (const strategy of strategies) {
+      try {
+        const response = await fetch(strategy, {
+          headers: {
+            'User-Agent': 'BastaBarriere/1.0 (geocoding service)'
+          }
+        })
+        
+        if (!response.ok) continue
+        
+        const data = await response.json()
+        
+        if (!data || data.length === 0) continue
+        
+        // Analizza i risultati di questa strategia
+        for (const result of data) {
+          const displayName = result.display_name || ''
+          const addressParts = result.address || {}
+          
+          // Calcola un punteggio di rilevanza
+          let score = 0
+          
+          // Priorità alta se contiene Civitavecchia
+          if (displayName.toLowerCase().includes('civitavecchia')) {
+            score += 100
+          }
+          
+          // Priorità alta se la città è Civitavecchia
+          if (addressParts.city?.toLowerCase() === 'civitavecchia') {
+            score += 80
+          }
+          
+          // Priorità media se è in provincia di Roma
+          if (addressParts.state === 'Lazio' || addressParts.county?.includes('Roma')) {
+            score += 20
+          }
+          
+          // Escludi completamente risultati con "Cisterna Faro"
+          if (displayName.includes('Cisterna Faro')) {
+            score -= 200 // Penalità molto forte
+          }
+          
+          // Bonus per risultati che non contengono frazioni
+          if (!displayName.match(/\b(Faro|Cisterna|Le Vignole|San Giuliano)\b/)) {
+            score += 30
+          }
+          
+          if (score > bestScore) {
+            bestScore = score
+            bestResult = result
+          }
+        }
+      } catch (error) {
+        console.error('Errore strategia geocoding:', error)
+        continue
       }
     }
     
-    if (!bestResult || bestScore < 50) {
-      return { success: false, error: 'Nessun risultato rilevante per Civitavecchia' }
+    if (!bestResult || bestScore < 80) {
+      return { success: false, error: 'Nessun risultato rilevante per Civitavecchia centro' }
     }
     
     // Estrai le coordinate
@@ -144,10 +159,9 @@ async function tryGeocoding(query: string) {
     // Formatta l'indirizzo completo
     let formattedAddress = bestResult.display_name || query
     
-    // Se l'indirizzo contiene "Cisterna Faro" ma anche "Civitavecchia", mantienilo
-    // Altrimenti, se contiene solo "Cisterna Faro", rifiutalo
-    if (formattedAddress.includes('Cisterna Faro') && !formattedAddress.includes('Civitavecchia')) {
-      return { success: false, error: 'Risultato non pertinente a Civitavecchia' }
+    // Filtro finale: escludi qualsiasi risultato con "Cisterna Faro"
+    if (formattedAddress.includes('Cisterna Faro')) {
+      return { success: false, error: 'Risultato non pertinente a Civitavecchia centro' }
     }
     
     return {
