@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 
@@ -60,6 +61,8 @@ interface FormData {
 export default function Home() {
   const [segnalazioni, setSegnalazioni] = useState<Segnalazione[]>([])
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isPersonalDataOpen, setIsPersonalDataOpen] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [filtroTipo, setFiltroTipo] = useState<string>('tutti')
   const [filtroStato, setFiltroStato] = useState<string>('tutti')
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null)
@@ -156,6 +159,57 @@ export default function Home() {
       )
     }
   }, [])
+
+  // Funzione per gestire il passaggio al secondo dialog
+  const handleContinueToPersonalData = () => {
+    if (!acceptedTerms) {
+      toast.error('Devi accettare le condizioni per proseguire')
+      return
+    }
+    
+    // Verifica che i campi obbligatori siano compilati
+    if (!formData.tipo || !formData.titolo || !formData.descrizione || !formData.indirizzo || !formData.gravita) {
+      toast.error('Compila tutti i campi obbligatori')
+      return
+    }
+    
+    setIsFormOpen(false)
+    setIsPersonalDataOpen(true)
+  }
+
+  // Funzione per resettare tutto quando si annulla
+  const handleCancelFirstDialog = () => {
+    setIsFormOpen(false)
+    setAcceptedTerms(false)
+    resetForm()
+  }
+
+  // Funzione per resettare quando si annulla il secondo dialog
+  const handleCancelSecondDialog = () => {
+    setIsPersonalDataOpen(false)
+    setAcceptedTerms(false)
+    resetForm()
+  }
+
+  // Funzione per resettare il form
+  const resetForm = () => {
+    setFormData({
+      tipo: '',
+      titolo: '',
+      descrizione: '',
+      indirizzo: '',
+      gravita: '',
+      nomeSegnalante: '',
+      emailSegnalante: '',
+      telefonoSegnalante: '',
+      foto: null
+    })
+    setAcceptedTerms(false)
+    setUseCurrentLocation(false)
+    setManualCoordinates(null)
+    setGeocodingStatus('')
+    setLocationStatus('')
+  }
 
   const handleInputChange = (field: keyof FormData, value: string | File) => {
     setFormData(prev => ({
@@ -453,7 +507,8 @@ export default function Home() {
 
       if (response.ok) {
         toast.success('Segnalazione inviata con successo!')
-        setIsFormOpen(false)
+        setIsPersonalDataOpen(false)
+        setAcceptedTerms(false)
         // Resetta il form
         setFormData({
           tipo: '',
@@ -591,12 +646,11 @@ export default function Home() {
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Nuova Segnalazione</span>
                     <span className="sm:hidden">Segnala</span>
-                    
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dialog-z-index">
                   <DialogHeader>
-                    <DialogTitle>Nuova Segnalazione</DialogTitle>
+                    <DialogTitle>Nuova Segnalazione - Step 1/2</DialogTitle>
                   </DialogHeader>
                   {useCurrentLocation && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
@@ -608,7 +662,7 @@ export default function Home() {
                       </div>
                     </div>
                   )}
-                  <form onSubmit={handleSubmit} className="grid gap-4 py-4" onClick={(e) => e.stopPropagation()}>
+                  <div className="grid gap-4 py-4" onClick={(e) => e.stopPropagation()}>
                     <div className="grid gap-2">
                       <Label htmlFor="tipo">Tipo di problema *</Label>
                       <Select value={formData.tipo} onValueChange={(value) => handleInputChange('tipo', value)}>
@@ -716,15 +770,159 @@ export default function Home() {
                       </Select>
                     </div>
                     
-                    
+                    {/* Sezione Condizioni */}
+                    <div className="border-t pt-4">
+                      <div className="space-y-3">
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                          <h4 className="font-medium text-amber-800 mb-2">📋 Condizioni di Utilizzo</h4>
+                          <div className="text-sm text-amber-700 space-y-2">
+                            <p><strong>Placeholder:</strong> Qui verranno inserite le condizioni complete:</p>
+                            <ul className="list-disc list-inside space-y-1 ml-2">
+                              <li>Trattamento dei dati personali secondo GDPR</li>
+                              <li>Finalità della raccolta dati</li>
+                              <li>Diritti dell'interessato</li>
+                              <li>Conservazione e sicurezza dei dati</li>
+                              <li>Condivisione con enti competenti</li>
+                            </ul>
+                            <p className="text-xs mt-2 italic">Le condizioni definitive sono in fase di redazione...</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3">
+                          <Checkbox 
+                            id="accept-terms"
+                            checked={acceptedTerms}
+                            onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                          />
+                          <div className="space-y-1">
+                            <Label htmlFor="accept-terms" className="text-sm font-medium cursor-pointer">
+                              Accetto le condizioni di utilizzo *
+                            </Label>
+                            <p className="text-xs text-gray-600">
+                              Obbligatorio per proseguire con l'inserimento di dati personali e foto
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     
                     <div className="flex justify-end space-x-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
+                      <Button type="button" variant="outline" onClick={handleCancelFirstDialog}>
                         Annulla
                       </Button>
-                      <Button type="submit" disabled={isLoading || isUploading}>
-                        {isLoading ? 'Invio in corso...' : isUploading ? 'Caricamento foto...' : 'Invia Segnalazione'}
+                      <Button 
+                        type="button" 
+                        onClick={handleContinueToPersonalData}
+                        disabled={!acceptedTerms || !formData.tipo || !formData.titolo || !formData.descrizione || !formData.indirizzo || !formData.gravita}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Continua →
                       </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              {/* Secondo Dialog - Dati Personali e Foto */}
+              <Dialog open={isPersonalDataOpen} onOpenChange={setIsPersonalDataOpen}>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dialog-z-index">
+                  <DialogHeader>
+                    <DialogTitle>Nuova Segnalazione - Step 2/2</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-medium text-green-800 mb-2">✅ Step 1 completato!</h4>
+                    <div className="text-sm text-green-700 space-y-1">
+                      <p><strong>Tipo:</strong> {formData.tipo}</p>
+                      <p><strong>Titolo:</strong> {formData.titolo}</p>
+                      <p><strong>Indirizzo:</strong> {formData.indirizzo}</p>
+                      <p><strong>Gravità:</strong> {formData.gravita}</p>
+                    </div>
+                  </div>
+                  
+                  <form onSubmit={handleSubmit} className="grid gap-4 py-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="border-t pt-4">
+                      <h3 className="font-medium mb-3">📝 Dati del segnalante (opzionali)</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Questi dati ci aiutano a contattarti per maggiori informazioni sulla segnalazione.
+                      </p>
+                      
+                      <div className="grid gap-2">
+                        <Label htmlFor="nome">Nome</Label>
+                        <Input 
+                          id="nome" 
+                          placeholder="Il tuo nome"
+                          value={formData.nomeSegnalante}
+                          onChange={(e) => handleInputChange('nomeSegnalante', e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-2 mt-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input 
+                          id="email" 
+                          type="email"
+                          placeholder="La tua email"
+                          value={formData.emailSegnalante}
+                          onChange={(e) => handleInputChange('emailSegnalante', e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-2 mt-2">
+                        <Label htmlFor="telefono">Telefono</Label>
+                        <Input 
+                          id="telefono" 
+                          placeholder="Il tuo numero di telefono"
+                          value={formData.telefonoSegnalante}
+                          onChange={(e) => handleInputChange('telefonoSegnalante', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="foto">📸 Foto (opzionale)</Label>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Una foto aiuta a comprendere meglio il problema.
+                      </p>
+                      <Input 
+                        id="foto" 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => handleInputChange('foto', e.target.files?.[0] || null)}
+                      />
+                      {formData.foto && (
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-600">
+                            File selezionato: {formData.foto.name}
+                          </p>
+                          <div className="mt-2">
+                            <img 
+                              src={URL.createObjectURL(formData.foto)} 
+                              alt="Anteprima"
+                              className="w-full h-32 object-cover rounded-md border"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex justify-between space-x-2 pt-4">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => {
+                          setIsPersonalDataOpen(false)
+                          setIsFormOpen(true)
+                        }}
+                      >
+                        ← Indietro
+                      </Button>
+                      <div className="flex space-x-2">
+                        <Button type="button" variant="outline" onClick={handleCancelSecondDialog}>
+                          Annulla
+                        </Button>
+                        <Button type="submit" disabled={isLoading || isUploading}>
+                          {isLoading ? 'Invio in corso...' : isUploading ? 'Caricamento foto...' : 'Invia Segnalazione'}
+                        </Button>
+                      </div>
                     </div>
                   </form>
                 </DialogContent>
