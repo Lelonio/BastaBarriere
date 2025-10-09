@@ -138,7 +138,7 @@ export default function Home() {
         // Debounce: attendi 1 secondo dopo che l'utente ha smesso di scrivere
         setTimeout(() => {
           geocodeAddress(value)
-        }, 1000)
+        }, 5000)
       }
     }
   }
