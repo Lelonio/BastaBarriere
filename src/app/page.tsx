@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MapPin, Plus, AlertTriangle, Navigation, Filter, Camera, Clock, CheckCircle, XCircle, Upload, Map as MapIcon, Settings, Crosshair, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,6 +71,7 @@ export default function Home() {
   const [isGeocoding, setIsGeocoding] = useState(false)
   const [geocodingStatus, setGeocodingStatus] = useState<string>('')
   const [manualCoordinates, setManualCoordinates] = useState<{lat: number, lng: number} | null>(null)
+  const geocodingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [formData, setFormData] = useState<FormData>({
     tipo: '',
     titolo: '',
@@ -133,12 +134,17 @@ export default function Home() {
       setManualCoordinates(null)
       setGeocodingStatus('')
       
+      // Cancella il timeout precedente se esiste
+      if (geocodingTimeoutRef.current) {
+        clearTimeout(geocodingTimeoutRef.current)
+      }
+      
       // Se l'utente non sta usando la posizione attuale, prova a fare geocoding automatico
       if (!useCurrentLocation && value && typeof value === 'string' && value.length > 5) {
-        // Debounce: attendi 1 secondo dopo che l'utente ha smesso di scrivere
-        setTimeout(() => {
+        // Debounce: attendi 3 secondi dopo che l'utente ha smesso di scrivere
+        geocodingTimeoutRef.current = setTimeout(() => {
           geocodeAddress(value)
-        }, 5000)
+        }, 3000)
       }
     }
   }
