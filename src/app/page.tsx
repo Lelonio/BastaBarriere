@@ -596,7 +596,7 @@ export default function Home() {
                       <div className="space-y-2">
                         <Input 
                           id="indirizzo" 
-                          placeholder="Via, piazza o luogo esatto"
+                          placeholder="Via, piazza o luogo esatto a Civitavecchia"
                           value={formData.indirizzo}
                           onChange={(e) => handleInputChange('indirizzo', e.target.value)}
                           disabled={useCurrentLocation}
@@ -664,6 +664,7 @@ export default function Home() {
                       </Select>
                     </div>
                     
+                  
                     
                     <div className="flex justify-end space-x-2 pt-4">
                       <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
