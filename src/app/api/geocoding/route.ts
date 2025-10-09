@@ -12,10 +12,73 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Usa Nominatim di OpenStreetMap per il geocoding limitato a Civitavecchia
-    // Aggiunge "Civitavecchia" alla query per limitare la ricerca
-    const searchQuery = `${address}, Civitavecchia, Italia`
-    const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&accept-language=it&countrycodes=it`
+    // Estrai il numero civico se presente
+    const civicNumberRegex = /^(\d+)\s+(.+)$|^([^\d]+)\s+(\d+)$/
+    let streetName = address.trim()
+    let civicNumber = ''
+    
+    const match = address.match(civicNumberRegex)
+    if (match) {
+      if (match[1] && match[2]) {
+        // Numero all'inizio: "123 Via Roma"
+        civicNumber = match[1]
+        streetName = match[2].trim()
+      } else if (match[3] && match[4]) {
+        // Numero alla fine: "Via Roma 123"
+        civicNumber = match[4]
+        streetName = match[3].trim()
+      }
+    }
+
+    // Prova prima con la query completa
+    let searchQuery = `${address}, Civitavecchia, RM, Italia`
+    
+    // Se non trova con il numero civico, prova senza
+    const results = await tryGeocoding(searchQuery)
+    
+    if (!results.success && civicNumber) {
+      // Riprova senza numero civico
+      searchQuery = `${streetName}, Civitavecchia, RM, Italia`
+      const retryResults = await tryGeocoding(searchQuery)
+      
+      if (retryResults.success) {
+        return NextResponse.json({
+          ...retryResults,
+          originalAddress: address,
+          civicNumber: civicNumber,
+          streetName: streetName
+        })
+      }
+    }
+    
+    if (results.success) {
+      return NextResponse.json({
+        ...results,
+        originalAddress: address,
+        civicNumber: civicNumber,
+        streetName: streetName
+      })
+    }
+    
+    return NextResponse.json(
+      { error: 'Indirizzo non trovato a Civitavecchia' },
+      { status: 404 }
+    )
+    
+  } catch (error) {
+    console.error('Errore geocoding:', error)
+    return NextResponse.json(
+      { error: 'Errore durante la geolocalizzazione dell\'indirizzo' },
+      { status: 500 }
+    )
+  }
+}
+
+// Funzione helper per tentare il geocoding
+async function tryGeocoding(query: string) {
+  try {
+    // Usa Nominatim con parametri più specifici
+    const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=it&countrycodes=it&addressdetails=1`
     
     const response = await fetch(geocodingUrl, {
       headers: {
@@ -30,57 +93,77 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     
     if (!data || data.length === 0) {
-      return NextResponse.json(
-        { error: 'Indirizzo non trovato' },
-        { status: 404 }
-      )
+      return { success: false, error: 'Nessun risultato' }
     }
     
-    const result = data[0]
+    // Cerca il risultato più rilevante per Civitavecchia
+    let bestResult = null
+    let bestScore = 0
     
-    // Verifica che il risultato sia effettivamente a Civitavecchia
-    const displayName = result.display_name || ''
-    const addressParts = result.address || {}
+    for (const result of data) {
+      const displayName = result.display_name || ''
+      const addressParts = result.address || {}
+      
+      // Calcola un punteggio di rilevanza
+      let score = 0
+      
+      // Priorità alta se contiene Civitavecchia
+      if (displayName.toLowerCase().includes('civitavecchia')) {
+        score += 100
+      }
+      
+      // Priorità alta se la città è Civitavecchia
+      if (addressParts.city?.toLowerCase() === 'civitavecchia') {
+        score += 80
+      }
+      
+      // Priorità media se è in provincia di Roma
+      if (addressParts.state === 'Lazio' || addressParts.county?.includes('Roma')) {
+        score += 20
+      }
+      
+      // Evita risultati che contengono "Cisterna Faro" come località principale
+      if (displayName.includes('Cisterna Faro') && !displayName.includes('Civitavecchia')) {
+        score -= 50
+      }
+      
+      if (score > bestScore) {
+        bestScore = score
+        bestResult = result
+      }
+    }
     
-    // Controlla che l'indirizzo contenga Civitavecchia
-    const isCivitavecchia = 
-      displayName.toLowerCase().includes('civitavecchia') ||
-      addressParts.city?.toLowerCase() === 'civitavecchia' ||
-      addressParts.town?.toLowerCase() === 'civitavecchia' ||
-      addressParts.municipality?.toLowerCase() === 'civitavecchia'
-    
-    if (!isCivitavecchia) {
-      return NextResponse.json(
-        { error: 'Indirizzo non trovato a Civitavecchia' },
-        { status: 404 }
-      )
+    if (!bestResult || bestScore < 50) {
+      return { success: false, error: 'Nessun risultato rilevante per Civitavecchia' }
     }
     
     // Estrai le coordinate
-    const lat = parseFloat(result.lat)
-    const lng = parseFloat(result.lon)
+    const lat = parseFloat(bestResult.lat)
+    const lng = parseFloat(bestResult.lon)
     
-    // Formatta l'indirizzo completo restituito dal servizio
-    const formattedAddress = result.display_name || address
+    // Formatta l'indirizzo completo
+    let formattedAddress = bestResult.display_name || query
     
-    return NextResponse.json({
+    // Se l'indirizzo contiene "Cisterna Faro" ma anche "Civitavecchia", mantienilo
+    // Altrimenti, se contiene solo "Cisterna Faro", rifiutalo
+    if (formattedAddress.includes('Cisterna Faro') && !formattedAddress.includes('Civitavecchia')) {
+      return { success: false, error: 'Risultato non pertinente a Civitavecchia' }
+    }
+    
+    return {
       success: true,
       lat,
       lng,
       address: formattedAddress,
-      originalAddress: address,
-      // Informazioni aggiuntive
-      importance: result.importance,
-      type: result.type,
-      class: result.class
-    })
+      importance: bestResult.importance,
+      type: bestResult.type,
+      class: bestResult.class,
+      addressParts: bestResult.address
+    }
     
   } catch (error) {
-    console.error('Errore geocoding:', error)
-    return NextResponse.json(
-      { error: 'Errore durante la geolocalizzazione dell\'indirizzo' },
-      { status: 500 }
-    )
+    console.error('Errore in tryGeocoding:', error)
+    return { success: false, error: error.message }
   }
 }
 
@@ -102,47 +185,18 @@ export async function POST(request: NextRequest) {
     
     const results = await Promise.allSettled(
       limitedAddresses.map(async (address: string) => {
-        // Limita la ricerca a Civitavecchia
-        const searchQuery = `${address}, Civitavecchia, Italia`
-        const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&accept-language=it&countrycodes=it`
+        const searchQuery = `${address}, Civitavecchia, RM, Italia`
+        const result = await tryGeocoding(searchQuery)
         
-        const response = await fetch(geocodingUrl, {
-          headers: {
-            'User-Agent': 'BastaBarriere/1.0 (geocoding service)'
+        if (result.success) {
+          return {
+            address,
+            lat: result.lat,
+            lng: result.lng,
+            formattedAddress: result.address
           }
-        })
-        
-        if (!response.ok) {
-          throw new Error(`Geocoding failed for: ${address}`)
-        }
-        
-        const data = await response.json()
-        
-        if (!data || data.length === 0) {
+        } else {
           return { address, error: 'Indirizzo non trovato a Civitavecchia' }
-        }
-        
-        const result = data[0]
-        
-        // Verifica che il risultato sia effettivamente a Civitavecchia
-        const displayName = result.display_name || ''
-        const addressParts = result.address || {}
-        
-        const isCivitavecchia = 
-          displayName.toLowerCase().includes('civitavecchia') ||
-          addressParts.city?.toLowerCase() === 'civitavecchia' ||
-          addressParts.town?.toLowerCase() === 'civitavecchia' ||
-          addressParts.municipality?.toLowerCase() === 'civitavecchia'
-        
-        if (!isCivitavecchia) {
-          return { address, error: 'Indirizzo non trovato a Civitavecchia' }
-        }
-        
-        return {
-          address,
-          lat: parseFloat(result.lat),
-          lng: parseFloat(result.lon),
-          formattedAddress: result.display_name || address
         }
       })
     )
