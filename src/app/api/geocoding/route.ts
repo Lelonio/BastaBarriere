@@ -12,8 +12,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Usa Nominatim di OpenStreetMap per il geocoding
-    const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=it`
+    // Usa Nominatim di OpenStreetMap per il geocoding limitato a Civitavecchia
+    // Aggiunge "Civitavecchia" alla query per limitare la ricerca
+    const searchQuery = `${address}, Civitavecchia, Italia`
+    const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&accept-language=it&countrycodes=it`
     
     const response = await fetch(geocodingUrl, {
       headers: {
@@ -35,6 +37,24 @@ export async function GET(request: NextRequest) {
     }
     
     const result = data[0]
+    
+    // Verifica che il risultato sia effettivamente a Civitavecchia
+    const displayName = result.display_name || ''
+    const addressParts = result.address || {}
+    
+    // Controlla che l'indirizzo contenga Civitavecchia
+    const isCivitavecchia = 
+      displayName.toLowerCase().includes('civitavecchia') ||
+      addressParts.city?.toLowerCase() === 'civitavecchia' ||
+      addressParts.town?.toLowerCase() === 'civitavecchia' ||
+      addressParts.municipality?.toLowerCase() === 'civitavecchia'
+    
+    if (!isCivitavecchia) {
+      return NextResponse.json(
+        { error: 'Indirizzo non trovato a Civitavecchia' },
+        { status: 404 }
+      )
+    }
     
     // Estrai le coordinate
     const lat = parseFloat(result.lat)
@@ -82,7 +102,9 @@ export async function POST(request: NextRequest) {
     
     const results = await Promise.allSettled(
       limitedAddresses.map(async (address: string) => {
-        const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=it`
+        // Limita la ricerca a Civitavecchia
+        const searchQuery = `${address}, Civitavecchia, Italia`
+        const geocodingUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&accept-language=it&countrycodes=it`
         
         const response = await fetch(geocodingUrl, {
           headers: {
@@ -97,10 +119,25 @@ export async function POST(request: NextRequest) {
         const data = await response.json()
         
         if (!data || data.length === 0) {
-          return { address, error: 'Indirizzo non trovato' }
+          return { address, error: 'Indirizzo non trovato a Civitavecchia' }
         }
         
         const result = data[0]
+        
+        // Verifica che il risultato sia effettivamente a Civitavecchia
+        const displayName = result.display_name || ''
+        const addressParts = result.address || {}
+        
+        const isCivitavecchia = 
+          displayName.toLowerCase().includes('civitavecchia') ||
+          addressParts.city?.toLowerCase() === 'civitavecchia' ||
+          addressParts.town?.toLowerCase() === 'civitavecchia' ||
+          addressParts.municipality?.toLowerCase() === 'civitavecchia'
+        
+        if (!isCivitavecchia) {
+          return { address, error: 'Indirizzo non trovato a Civitavecchia' }
+        }
+        
         return {
           address,
           lat: parseFloat(result.lat),
