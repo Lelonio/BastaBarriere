@@ -127,10 +127,6 @@ async function tryGeocoding(query: string) {
             score += 20
           }
           
-          // Escludi completamente risultati con "Cisterna Faro"
-          if (displayName.includes('Cisterna Faro')) {
-            score -= 200 // Penalità molto forte
-          }
           
           // Bonus per risultati che non contengono frazioni
           if (!displayName.match(/\b(Faro|Cisterna|Le Vignole|San Giuliano)\b/)) {
