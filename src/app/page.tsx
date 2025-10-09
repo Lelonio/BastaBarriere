@@ -590,8 +590,8 @@ export default function Home() {
                   <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Nuova Segnalazione</span>
-                    <span className="sm:hidden">Nuova</span>
-                    <Crosshair className="h-4 w-4 ml-2 opacity-70" />
+                    <span className="sm:hidden">Segnala</span>
+                    
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dialog-z-index">
