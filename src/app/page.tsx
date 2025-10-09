@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 
 // Import Map component dynamically to avoid SSR issues
 const Map = dynamic(() => import('@/components/Map'), { 
@@ -1088,6 +1089,9 @@ export default function Home() {
           )}
         </div>
       </main>
+      
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   )
 }
