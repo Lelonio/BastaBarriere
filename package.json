@@ -61,6 +61,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/leaflet": "^1.9.20",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
