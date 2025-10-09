@@ -68,6 +68,9 @@ export default function Home() {
   const [locationStatus, setLocationStatus] = useState<string>('')
   const [useCurrentLocation, setUseCurrentLocation] = useState<boolean>(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isGeocoding, setIsGeocoding] = useState(false)
+  const [geocodingStatus, setGeocodingStatus] = useState<string>('')
+  const [manualCoordinates, setManualCoordinates] = useState<{lat: number, lng: number} | null>(null)
   const [formData, setFormData] = useState<FormData>({
     tipo: '',
     titolo: '',
@@ -124,6 +127,63 @@ export default function Home() {
       ...prev,
       [field]: value
     }))
+    
+    // Se l'utente modifica l'indirizzo manualmente, resetta le coordinate manuali
+    if (field === 'indirizzo') {
+      setManualCoordinates(null)
+      setGeocodingStatus('')
+      
+      // Se l'utente non sta usando la posizione attuale, prova a fare geocoding automatico
+      if (!useCurrentLocation && value && typeof value === 'string' && value.length > 5) {
+        // Debounce: attendi 1 secondo dopo che l'utente ha smesso di scrivere
+        setTimeout(() => {
+          geocodeAddress(value)
+        }, 1000)
+      }
+    }
+  }
+
+  // Funzione per geocoding manuale dell'indirizzo
+  const geocodeAddress = async (address: string) => {
+    if (!address || address.length < 3) return
+    
+    setIsGeocoding(true)
+    setGeocodingStatus('Ricerca indirizzo in corso...')
+    
+    try {
+      const response = await fetch(`/api/geocoding?address=${encodeURIComponent(address)}`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        
+        if (data.success) {
+          setManualCoordinates({ lat: data.lat, lng: data.lng })
+          setGeocodingStatus('✅ Indirizzo trovato e geolocalizzato')
+          toast.success('Indirizzo geolocalizzato con successo!')
+          
+          // Aggiorna l'indirizzo con quello formattato dal servizio
+          if (data.address !== address) {
+            setFormData(prev => ({
+              ...prev,
+              indirizzo: data.address
+            }))
+          }
+        } else {
+          setGeocodingStatus('❌ Indirizzo non trovato')
+          toast.error('Indirizzo non trovato. Prova a essere più specifico.')
+        }
+      } else {
+        const errorData = await response.json()
+        setGeocodingStatus('❌ Errore nella ricerca')
+        toast.error(errorData.error || 'Errore nella geolocalizzazione')
+      }
+    } catch (error) {
+      console.error('Errore geocoding:', error)
+      setGeocodingStatus('❌ Errore di connessione')
+      toast.error('Errore durante la geolocalizzazione dell\'indirizzo')
+    } finally {
+      setIsGeocoding(false)
+    }
   }
 
   // Funzione per ottenere la posizione attuale
@@ -228,6 +288,8 @@ export default function Home() {
   const resetLocationUsage = () => {
     setUseCurrentLocation(false)
     setLocationStatus('')
+    setManualCoordinates(null)
+    setGeocodingStatus('')
     setFormData(prev => ({
       ...prev,
       indirizzo: ''
@@ -239,17 +301,52 @@ export default function Home() {
     setIsLoading(true)
 
     try {
-      // Usa le coordinate dell'utente se disponibili, altrimenti usa quelle di Civitavecchia
+      // Logica per determinare le coordinate corrette
       let lat = 42.0909 // Default Civitavecchia
       let lng = 11.7935  // Default Civitavecchia
       
+      // Priorità: 1. Posizione attuale se esplicitamente usata, 2. Coordinate manuali da geocoding, 3. Posizione utente, 4. Default
       if (useCurrentLocation && userLocation) {
+        // Utente ha scelto di usare la posizione GPS attuale
         lat = userLocation.lat
         lng = userLocation.lng
+      } else if (manualCoordinates) {
+        // Abbiamo coordinate dal geocoding manuale dell'indirizzo
+        lat = manualCoordinates.lat
+        lng = manualCoordinates.lng
       } else if (userLocation) {
-        // Se abbiamo la posizione utente ma non stiamo usando esplicitamente quella attuale
+        // Fallback alla posizione GPS dell'utente
         lat = userLocation.lat
         lng = userLocation.lng
+      } else {
+        // Se abbiamo un indirizzo ma non coordinate, prova a geocodificarlo ora
+        if (formData.indirizzo && formData.indirizzo.length > 5) {
+          setIsGeocoding(true)
+          setGeocodingStatus('Geolocalizzazione indirizzo in corso...')
+          
+          try {
+            const geocodeResponse = await fetch(`/api/geocoding?address=${encodeURIComponent(formData.indirizzo)}`)
+            
+            if (geocodeResponse.ok) {
+              const geocodeData = await geocodeResponse.json()
+              
+              if (geocodeData.success) {
+                lat = geocodeData.lat
+                lng = geocodeData.lng
+                setManualCoordinates({ lat: geocodeData.lat, lng: geocodeData.lng })
+                setGeocodingStatus('✅ Indirizzo geolocalizzato')
+              } else {
+                toast.warning('Indirizzo non geolocalizzato, uso posizione di default')
+                setGeocodingStatus('⚠️ Indirizzo non trovato, uso posizione default')
+              }
+            }
+          } catch (error) {
+            console.error('Errore geocoding durante submit:', error)
+            toast.warning('Impossibile geolocalizzare l\'indirizzo, uso posizione di default')
+          } finally {
+            setIsGeocoding(false)
+          }
+        }
       }
 
       let fotoUrl = undefined
@@ -320,6 +417,8 @@ export default function Home() {
         // Resetta anche lo stato della posizione
         setUseCurrentLocation(false)
         setLocationStatus('')
+        setManualCoordinates(null)
+        setGeocodingStatus('')
         // Ricarica le segnalazioni
         loadSegnalazioni()
       } else {
@@ -439,8 +538,8 @@ export default function Home() {
                   <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Nuova Segnalazione</span>
-                    <span className="sm:hidden">Segnala</span>
-              
+                    <span className="sm:hidden">Nuova</span>
+                    <Crosshair className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto dialog-z-index">
@@ -534,9 +633,19 @@ export default function Home() {
                             {locationStatus}
                           </div>
                         )}
+                        {geocodingStatus && !useCurrentLocation && (
+                          <div className={`text-sm ${geocodingStatus.includes('✅') ? 'text-green-600' : geocodingStatus.includes('❌') ? 'text-red-600' : 'text-blue-600'}`}>
+                            {geocodingStatus}
+                          </div>
+                        )}
                         {useCurrentLocation && userLocation && (
                           <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
                             📍 Coordinate: {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
+                          </div>
+                        )}
+                        {manualCoordinates && !useCurrentLocation && (
+                          <div className="text-xs text-green-600 bg-green-50 p-2 rounded border border-green-200">
+                            📍 Coordinate geolocalizzate: {manualCoordinates.lat.toFixed(6)}, {manualCoordinates.lng.toFixed(6)}
                           </div>
                         )}
                       </div>
@@ -554,7 +663,6 @@ export default function Home() {
                         </SelectContent>
                       </Select>
                     </div>
-                    
                     
                     
                     <div className="flex justify-end space-x-2 pt-4">
