@@ -72,6 +72,42 @@ export default function Home() {
   const [geocodingStatus, setGeocodingStatus] = useState<string>('')
   const [manualCoordinates, setManualCoordinates] = useState<{lat: number, lng: number} | null>(null)
   const geocodingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // Funzione per pulire l'indirizzo rimuovendo le frazioni
+  const cleanAddress = (address: string): string => {
+    if (!address) return address
+    
+    // Rimuovi le frazioni comuni di Civitavecchia
+    const fractionsToRemove = [
+      'Borgo Odescalchi,',
+      'Borgo Odescalchi',
+      'Cisterna Faro,',
+      'Cisterna Faro',
+      'Le Vignole,',
+      'Le Vignole',
+      'San Giuliano,',
+      'San Giuliano',
+      'Piazzale delle Vittorie,',
+      'Piazzale delle Vittorie'
+    ]
+    
+    let cleanedAddress = address
+    
+    fractionsToRemove.forEach(fraction => {
+      // Rimuovi la frazione con o senza virgola
+      cleanedAddress = cleanedAddress.replace(new RegExp(`,?\\s*${fraction.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*,?`, 'gi'), ',')
+    })
+    
+    // Pulisci virgole multiple e spazi extra
+    cleanedAddress = cleanedAddress.replace(/,\s*,/g, ',').replace(/,\s*$/, '').trim()
+    
+    // Se l'indirizzo inizia con una virgola, rimuovila
+    if (cleanedAddress.startsWith(',')) {
+      cleanedAddress = cleanedAddress.substring(1).trim()
+    }
+    
+    return cleanedAddress
+  }
   const [formData, setFormData] = useState<FormData>({
     tipo: '',
     titolo: '',
@@ -167,11 +203,14 @@ export default function Home() {
           setGeocodingStatus('✅ Indirizzo trovato e geolocalizzato')
           toast.success('Indirizzo geolocalizzato con successo!')
           
-          // Aggiorna l'indirizzo con quello formattato dal servizio
-          if (data.address !== address) {
+          // Pulisci l'indirizzo rimuovendo le frazioni
+          const cleanedAddress = cleanAddress(data.address)
+          
+          // Aggiorna l'indirizzo con quello pulito
+          if (cleanedAddress !== address) {
             setFormData(prev => ({
               ...prev,
-              indirizzo: data.address
+              indirizzo: cleanedAddress
             }))
           }
         } else {
@@ -341,6 +380,15 @@ export default function Home() {
                 lng = geocodeData.lng
                 setManualCoordinates({ lat: geocodeData.lat, lng: geocodeData.lng })
                 setGeocodingStatus('✅ Indirizzo geolocalizzato')
+                
+                // Pulisci anche l'indirizzo nel form durante il submit
+                const cleanedAddress = cleanAddress(geocodeData.address)
+                if (cleanedAddress !== formData.indirizzo) {
+                  setFormData(prev => ({
+                    ...prev,
+                    indirizzo: cleanedAddress
+                  }))
+                }
               } else {
                 toast.warning('Indirizzo non geolocalizzato, uso posizione di default')
                 setGeocodingStatus('⚠️ Indirizzo non trovato, uso posizione default')
@@ -670,7 +718,61 @@ export default function Home() {
                       </Select>
                     </div>
                     
-                  
+                    <div className="border-t pt-4">
+                      <h3 className="font-medium mb-3">Dati del segnalante (opzionali)</h3>
+                      <div className="grid gap-2">
+                        <Label htmlFor="nome">Nome</Label>
+                        <Input 
+                          id="nome" 
+                          placeholder="Il tuo nome"
+                          value={formData.nomeSegnalante}
+                          onChange={(e) => handleInputChange('nomeSegnalante', e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-2 mt-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input 
+                          id="email" 
+                          type="email"
+                          placeholder="La tua email"
+                          value={formData.emailSegnalante}
+                          onChange={(e) => handleInputChange('emailSegnalante', e.target.value)}
+                        />
+                      </div>
+                      <div className="grid gap-2 mt-2">
+                        <Label htmlFor="telefono">Telefono</Label>
+                        <Input 
+                          id="telefono" 
+                          placeholder="Il tuo numero di telefono"
+                          value={formData.telefonoSegnalante}
+                          onChange={(e) => handleInputChange('telefonoSegnalante', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="foto">Foto (opzionale)</Label>
+                      <Input 
+                        id="foto" 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => handleInputChange('foto', e.target.files?.[0] || null)}
+                      />
+                      {formData.foto && (
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-600">
+                            File selezionato: {formData.foto.name}
+                          </p>
+                          <div className="mt-2">
+                            <img 
+                              src={URL.createObjectURL(formData.foto)} 
+                              alt="Anteprima"
+                              className="w-full h-32 object-cover rounded-md border"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="flex justify-end space-x-2 pt-4">
                       <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
