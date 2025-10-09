@@ -49,7 +49,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto w-12 h-12 bg-brand-500 rounded-full flex items-center justify-center mb-4">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold">Accesso Admin</CardTitle>
@@ -83,7 +83,7 @@ export default function AdminLogin() {
             
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700" 
+              className="w-full bg-brand-500 hover:bg-brand-600" 
               disabled={isLoading}
             >
               {isLoading ? 'Accesso in corso...' : 'Accedi'}

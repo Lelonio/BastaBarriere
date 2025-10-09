@@ -271,7 +271,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-pulse" />
+          <Shield className="h-12 w-12 text-brand-500 mx-auto mb-4 animate-pulse" />
           <p className="text-gray-600">Verifica autenticazione...</p>
         </div>
       </div>
