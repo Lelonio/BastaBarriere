@@ -79,8 +79,6 @@ export default function Home() {
     
     // Rimuovi le frazioni comuni di Civitavecchia
     const fractionsToRemove = [
-      'Borgo Odescalchi,',
-      'Borgo Odescalchi',
       'Cisterna Faro,',
       'Cisterna Faro',
       'Le Vignole,',
