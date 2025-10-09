@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     ],
   },
   other: {
-    "msapplication-TileColor": "#2563eb",
+"msapplication-TileColor": "hsl(24, 68%, 45%)",
     "msapplication-config": "/browserconfig.xml",
   },
 };

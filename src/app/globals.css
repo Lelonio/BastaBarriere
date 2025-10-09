@@ -45,71 +45,111 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Palette Brand BastaBarriere - Alloy Orange Theme */
+  --brand-50: #fef8f5;
+  --brand-100: #fdf1ec;
+  --brand-200: #f8e3d8;
+  --brand-300: #f1d1c0;
+  --brand-400: #e8b89f;
+  --brand-500: hsl(24, 68%, 45%);        /* Alloy Orange - #B8652D */
+  --brand-600: hsl(24, 68%, 40%);        /* Più scuro - #A65828 */
+  --brand-700: hsl(24, 68%, 35%);        /* Ancora più scuro - #944B23 */
+  --brand-800: hsl(24, 68%, 30%);        /* Molto scuro - #823E1E */
+  --brand-900: hsl(24, 68%, 25%);        /* Quasi nero - #703119 */
+  
+  /* Palette Accessibilità - Blu Azzurri */
+  --access-50: #f0f9ff;
+  --access-100: #e0f2fe;
+  --access-200: #bae6fd;
+  --access-300: #7dd3fc;
+  --access-400: #38bdf8;
+  --access-500: #0ea5e9;
+  --access-600: #0284c7;
+  --access-700: #0369a1;
+  --access-800: #075985;
+  --access-900: #0c4a6e;
+  
+  /* Colori Stato */
+  --success-50: #f0fdf4;
+  --success-500: #16a34a;
+  --success-600: #15803d;
+  
+  --warning-50: #fffbeb;
+  --warning-500: #d97706;
+  --warning-600: #c2410c;
+  
+  --danger-50: #fef2f2;
+  --danger-500: #dc2626;
+  --danger-600: #b91c1c;
+  
+  /* Variabili di sistema originali con override brand */
+  --background: #FEFEFE;                  /* Bianco caldo */
+  --foreground: hsl(24, 15%, 15%);        /* Marrone molto scuro - #2A2420 */
+  --card: #FFFFFF;
+  --card-foreground: hsl(24, 15%, 15%);
+  --popover: #FFFFFF;
+  --popover-foreground: hsl(24, 15%, 15%);
+  --primary: hsl(24, 68%, 45%);           /* Alloy Orange */
+  --primary-foreground: #FFFFFF;
+  --secondary: hsl(24, 20%, 85%);          /* Beige chiaro */
+  --secondary-foreground: hsl(24, 68%, 25%); /* Marrone scuro */
+  --muted: hsl(24, 20%, 95%);             /* Grigio caldo */
+  --muted-foreground: hsl(24, 10%, 45%);  /* Grigio marrone */
+  --accent: hsl(24, 60%, 50%);            /* Arancione acceso */
+  --accent-foreground: #FFFFFF;
+  --destructive: hsl(0, 84%, 60%);        /* Rosso allarme */
+  --border: hsl(24, 20%, 88%);            /* Bordo leggero */
+  --input: hsl(24, 20%, 88%);             /* Input bordo */
+  --ring: hsl(24, 68%, 45%);              /* Alloy Orange */
+  --chart-1: hsl(24, 68%, 45%);           /* Alloy Orange */
+  --chart-2: hsl(142, 76%, 36%);          /* Verde accessibilità */
+  --chart-3: hsl(38, 92%, 50%);           /* Arancione sicurezza */
+  --chart-4: hsl(24, 60%, 50%);           /* Arancione acceso */
+  --chart-5: hsl(0, 84%, 60%);            /* Rosso allarme */
+  --sidebar: #fdf1ec;                     /* Brand 100 */
+  --sidebar-foreground: hsl(24, 15%, 15%);
+  --sidebar-primary: hsl(24, 68%, 45%);   /* Alloy Orange */
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: hsl(24, 20%, 85%);    /* Beige chiaro */
+  --sidebar-accent-foreground: hsl(24, 68%, 25%);
+  --sidebar-border: hsl(24, 20%, 88%);    /* Bordo leggero */
+  --sidebar-ring: hsl(24, 68%, 45%);      /* Alloy Orange */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Background più scuro con hint del brand Alloy Orange */
+  --background: hsl(24, 25%, 8%);          /* Molto scuro con hint arancione */
+  --foreground: #FEFEFE;                  /* Bianco caldo */
+  --card: hsl(24, 25%, 12%);              /* Card scure */
+  --card-foreground: #FEFEFE;
+  --popover: hsl(24, 25%, 12%);
+  --popover-foreground: #FEFEFE;
+  --primary: hsl(24, 68%, 55%);           /* Alloy Orange più chiaro per contrasto */
+  --primary-foreground: hsl(24, 25%, 8%);  /* Background scuro */
+  --secondary: hsl(24, 25%, 18%);         /* Secondary scuro */
+  --secondary-foreground: #FEFEFE;
+  --muted: hsl(24, 25%, 22%);             /* Muted scuro */
+  --muted-foreground: hsl(24, 15%, 65%);  /* Testo muted */
+  --accent: hsl(24, 68%, 50%);            /* Accent arancione */
+  --accent-foreground: #FEFEFE;
+  --destructive: hsl(0, 84%, 70%);        /* Rosso più vivido nel dark */
+  --border: hsl(24, 25%, 20%);            /* Bordo scuro */
+  --input: hsl(24, 25%, 20%);             /* Input scuro */
+  --ring: hsl(24, 68%, 55%);              /* Alloy Orange più chiaro */
+  --chart-1: hsl(24, 68%, 55%);           /* Alloy Orange più chiaro */
+  --chart-2: hsl(142, 76%, 46%);          /* Verde più vivido */
+  --chart-3: hsl(38, 92%, 60%);           /* Arancione più vivido */
+  --chart-4: hsl(24, 68%, 50%);           /* Arancione acceso */
+  --chart-5: hsl(0, 84%, 70%);            /* Rosso più vivido */
+  --sidebar: hsl(24, 25%, 12%);           /* Card color */
+  --sidebar-foreground: #FEFEFE;
+  --sidebar-primary: hsl(24, 68%, 55%);   /* Alloy Orange più chiaro */
+  --sidebar-primary-foreground: hsl(24, 25%, 8%);
+  --sidebar-accent: hsl(24, 25%, 18%);    /* Secondary scuro */
+  --sidebar-accent-foreground: #FEFEFE;
+  --sidebar-border: hsl(24, 25%, 20%);    /* Bordo scuro */
+  --sidebar-ring: hsl(24, 68%, 55%);      /* Alloy Orange più chiaro */
 }
 
 @layer base {
@@ -125,6 +165,149 @@
 @layer utilities {
   .dialog-z-index {
     z-index: 10000 !important;
+  }
+  
+  /* Classi utility personalizzate per palette brand */
+  .bg-brand {
+    background-color: var(--brand-500);
+  }
+  
+  .bg-brand-50 { background-color: var(--brand-50); }
+  .bg-brand-100 { background-color: var(--brand-100); }
+  .bg-brand-200 { background-color: var(--brand-200); }
+  .bg-brand-300 { background-color: var(--brand-300); }
+  .bg-brand-400 { background-color: var(--brand-400); }
+  .bg-brand-500 { background-color: var(--brand-500); }
+  .bg-brand-600 { background-color: var(--brand-600); }
+  .bg-brand-700 { background-color: var(--brand-700); }
+  .bg-brand-800 { background-color: var(--brand-800); }
+  .bg-brand-900 { background-color: var(--brand-900); }
+  
+  .text-brand {
+    color: var(--brand-500);
+  }
+  
+  .text-brand-600 { color: var(--brand-600); }
+  .text-brand-700 { color: var(--brand-700); }
+  .text-brand-800 { color: var(--brand-800); }
+  .text-brand-900 { color: var(--brand-900); }
+  
+  .border-brand {
+    border-color: var(--brand-400);
+  }
+  
+  .bg-access {
+    background-color: var(--access-500);
+  }
+  
+  .text-access {
+    color: var(--access-500);
+  }
+  
+  .bg-success {
+    background-color: var(--success-500);
+  }
+  
+  .bg-success-50 { background-color: var(--success-50); }
+  .bg-success-100 { background-color: #dcfce7; }
+  .bg-success-500 { background-color: var(--success-500); }
+  .bg-success-600 { background-color: var(--success-600); }
+  .bg-success-700 { background-color: #15803d; }
+  .bg-success-800 { background-color: #166534; }
+  .bg-success-900 { background-color: #14532d; }
+  
+  .text-success-500 { color: var(--success-500); }
+  .text-success-600 { color: var(--success-600); }
+  .text-success-700 { color: #15803d; }
+  .text-success-800 { color: #166534; }
+  .text-success-900 { color: #14532d; }
+  
+  .border-success-200 { border-color: #bbf7d0; }
+  .border-success-700 { border-color: #15803d; }
+  
+  .bg-warning {
+    background-color: var(--warning-500);
+  }
+  
+  .bg-warning-50 { background-color: var(--warning-50); }
+  .bg-warning-100 { background-color: #fef3c7; }
+  .bg-warning-500 { background-color: var(--warning-500); }
+  .bg-warning-600 { background-color: var(--warning-600); }
+  .bg-warning-700 { background-color: #c2410c; }
+  .bg-warning-800 { background-color: #9a3412; }
+  .bg-warning-900 { background-color: #78350f; }
+  
+  .text-warning-500 { color: var(--warning-500); }
+  .text-warning-600 { color: var(--warning-600); }
+  .text-warning-700 { color: #c2410c; }
+  .text-warning-800 { color: #9a3412; }
+  .text-warning-900 { color: #78350f; }
+  
+  .border-warning-200 { border-color: #fde68a; }
+  .border-warning-700 { border-color: #c2410c; }
+  
+  .bg-danger {
+    background-color: var(--danger-500);
+  }
+  
+  .bg-danger-50 { background-color: var(--danger-50); }
+  .bg-danger-100 { background-color: #fee2e2; }
+  .bg-danger-500 { background-color: var(--danger-500); }
+  .bg-danger-600 { background-color: var(--danger-600); }
+  .bg-danger-700 { background-color: #b91c1c; }
+  .bg-danger-800 { background-color: #991b1b; }
+  .bg-danger-900 { background-color: #7f1d1d; }
+  
+  .text-danger-500 { color: var(--danger-500); }
+  .text-danger-600 { color: var(--danger-600); }
+  .text-danger-700 { color: #b91c1c; }
+  .text-danger-800 { color: #991b1b; }
+  .text-danger-900 { color: #7f1d1d; }
+  
+  .border-danger-200 { border-color: #fecaca; }
+  .border-danger-700 { border-color: #b91c1c; }
+  
+  .text-success {
+    color: var(--success-500);
+  }
+  
+  .bg-warning {
+    background-color: var(--warning-500);
+  }
+  
+  .text-warning {
+    color: var(--warning-500);
+  }
+  
+  .bg-danger {
+    background-color: var(--danger-500);
+  }
+  
+  .text-danger {
+    color: var(--danger-500);
+  }
+  
+  /* Stili specifici per i pulsanti principali */
+  .btn-primary {
+    background-color: var(--brand-500);
+    color: var(--primary-foreground);
+    border: 1px solid var(--brand-600);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--brand-600);
+    border-color: var(--brand-700);
+  }
+  
+  .btn-access {
+    background-color: var(--access-500);
+    color: white;
+    border: 1px solid var(--access-600);
+  }
+  
+  .btn-access:hover {
+    background-color: var(--access-600);
+    border-color: var(--access-700);
   }
   
   /* Assicura che i dialog shadcn/ui siano sopra la mappa */

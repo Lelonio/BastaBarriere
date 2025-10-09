@@ -586,27 +586,27 @@ export default function Home() {
 
   const getGravitaColor = (gravita: string) => {
     switch(gravita) {
-      case 'alta': return 'bg-red-100 text-red-800 border-red-200'
-      case 'media': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'bassa': return 'bg-green-100 text-green-800 border-green-200'
+      case 'alta': return 'bg-danger-50 text-danger-800 border-danger-200'
+      case 'media': return 'bg-warning-50 text-warning-800 border-warning-200'
+      case 'bassa': return 'bg-success-50 text-success-800 border-success-200'
       default: return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
 
   const getStatoIcon = (stato: string) => {
     switch(stato) {
-      case 'aperta': return <XCircle className="h-4 w-4 text-red-500" />
-      case 'in_lavorazione': return <Clock className="h-4 w-4 text-yellow-500" />
-      case 'risolta': return <CheckCircle className="h-4 w-4 text-green-500" />
+      case 'aperta': return <XCircle className="h-4 w-4 text-danger-500" />
+      case 'in_lavorazione': return <Clock className="h-4 w-4 text-warning-500" />
+      case 'risolta': return <CheckCircle className="h-4 w-4 text-success-500" />
       default: return null
     }
   }
 
   const getStatoColor = (stato: string) => {
     switch(stato) {
-      case 'aperta': return 'bg-red-50 text-red-700 border-red-200'
-      case 'in_lavorazione': return 'bg-yellow-50 text-yellow-700 border-yellow-200'
-      case 'risolta': return 'bg-green-50 text-green-700 border-green-200'
+      case 'aperta': return 'bg-danger-50 text-danger-700 border-danger-200'
+      case 'in_lavorazione': return 'bg-warning-50 text-warning-700 border-warning-200'
+      case 'risolta': return 'bg-success-50 text-success-700 border-success-200'
       default: return 'bg-gray-50 text-gray-700 border-gray-200'
     }
   }
@@ -618,13 +618,13 @@ export default function Home() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100">
       {/* Header */}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
+              <div className="bg-brand-500 p-2 rounded-lg">
                 <img
                   src="/logo.png"
                   alt="BastaBarriere Logo"
@@ -638,12 +638,12 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 w-fit mx-auto sm:mx-0">
+              <Badge variant="outline" className="bg-brand-100 text-brand-800 border-brand-200 w-fit mx-auto sm:mx-0">
                 {segnalazioni.length} segnalazioni
               </Badge>
               <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                  <Button className="btn-primary w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Nuova Segnalazione</span>
                     <span className="sm:hidden">Segnala</span>
@@ -654,10 +654,10 @@ export default function Home() {
                     <DialogTitle>Nuova Segnalazione - Step 1/2</DialogTitle>
                   </DialogHeader>
                   {useCurrentLocation && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <div className="bg-access-50 border border-access-200 rounded-lg p-3 mb-4">
                       <div className="flex items-center space-x-2">
-                        <Crosshair className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm text-blue-800">
+                        <Crosshair className="h-4 w-4 text-access-600" />
+                        <span className="text-sm text-access-800">
                           Stai usando la tua posizione attuale per questa segnalazione
                         </span>
                       </div>
@@ -741,7 +741,7 @@ export default function Home() {
                           </div>
                         )}
                         {geocodingStatus && !useCurrentLocation && (
-                          <div className={`text-sm ${geocodingStatus.includes('✅') ? 'text-green-600' : geocodingStatus.includes('❌') ? 'text-red-600' : 'text-blue-600'}`}>
+                          <div className={`text-sm ${geocodingStatus.includes('✅') ? 'text-green-600' : geocodingStatus.includes('❌') ? 'text-red-600' : 'text-brand-600'}`}>
                             {geocodingStatus}
                           </div>
                         )}
@@ -774,9 +774,9 @@ export default function Home() {
                     {/* Sezione Condizioni */}
                     <div className="border-t pt-4">
                       <div className="space-y-3">
-                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                          <h4 className="font-medium text-amber-800 mb-2">📋 Condizioni di Utilizzo</h4>
-                          <div className="text-sm text-amber-700 space-y-2">
+                        <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
+                          <h4 className="font-medium text-warning-800 mb-2">📋 Condizioni di Utilizzo</h4>
+                          <div className="text-sm text-warning-700 space-y-2">
                             <p><strong>Placeholder:</strong> Qui verranno inserite le condizioni complete:</p>
                             <ul className="list-disc list-inside space-y-1 ml-2">
                               <li>Trattamento dei dati personali secondo GDPR</li>
@@ -815,7 +815,7 @@ export default function Home() {
                         type="button" 
                         onClick={handleContinueToPersonalData}
                         disabled={!acceptedTerms || !formData.tipo || !formData.titolo || !formData.descrizione || !formData.indirizzo || !formData.gravita}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="btn-primary"
                       >
                         Continua →
                       </Button>
@@ -831,9 +831,9 @@ export default function Home() {
                     <DialogTitle>Nuova Segnalazione - Step 2/2</DialogTitle>
                   </DialogHeader>
                   
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                    <h4 className="font-medium text-green-800 mb-2">✅ Step 1 completato!</h4>
-                    <div className="text-sm text-green-700 space-y-1">
+                  <div className="bg-success-50 border border-success-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-medium text-success-800 mb-2">✅ Step 1 completato!</h4>
+                    <div className="text-sm text-success-700 space-y-1">
                       <p><strong>Tipo:</strong> {formData.tipo}</p>
                       <p><strong>Titolo:</strong> {formData.titolo}</p>
                       <p><strong>Indirizzo:</strong> {formData.indirizzo}</p>
@@ -972,7 +972,7 @@ export default function Home() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5 text-blue-600" />
+              <MapPin className="h-5 w-5 text-brand-600" />
               <span>Mappa delle Segnalazioni</span>
             </CardTitle>
           </CardHeader>
@@ -1052,7 +1052,7 @@ export default function Home() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleValuta(segnalazione.id, 'pertinente')}
-                          className="flex-1 h-7 text-xs bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+                          className="flex-1 h-7 text-xs bg-success-50 hover:bg-success-100 border-success-200 text-success-700"
                         >
                           <ThumbsUp className="h-3 w-3 mr-1" />
                           Sì
@@ -1061,7 +1061,7 @@ export default function Home() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleValuta(segnalazione.id, 'non_pertinente')}
-                          className="flex-1 h-7 text-xs bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
+                          className="flex-1 h-7 text-xs bg-danger-50 hover:bg-danger-100 border-danger-200 text-danger-700"
                         >
                           <ThumbsDown className="h-3 w-3 mr-1" />
                           No
