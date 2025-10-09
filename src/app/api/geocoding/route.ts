@@ -159,10 +159,6 @@ async function tryGeocoding(query: string) {
     // Formatta l'indirizzo completo
     let formattedAddress = bestResult.display_name || query
     
-    // Filtro finale: escludi qualsiasi risultato con "Cisterna Faro"
-    if (formattedAddress.includes('Cisterna Faro')) {
-      return { success: false, error: 'Risultato non pertinente a Civitavecchia centro' }
-    }
     
     return {
       success: true,
