@@ -611,6 +611,16 @@ export default function Home() {
     }
   }
 
+  const getTipoColor = (tipo: string) => {
+    switch(tipo) {
+      case 'buca': return 'bg-purple-50 text-purple-700 border-purple-200'
+      case 'barriera': return 'bg-indigo-50 text-indigo-700 border-indigo-200'
+      case 'illuminazione': return 'bg-orange-50 text-orange-700 border-orange-200'
+      case 'altro': return 'bg-slate-50 text-slate-700 border-slate-200'
+      default: return 'bg-gray-50 text-gray-700 border-gray-200'
+    }
+  }
+
   const segnalazioniFiltrate = segnalazioni.filter(s => {
     const tipoMatch = filtroTipo === 'tutti' || s.tipo === filtroTipo
     const statoMatch = filtroStato === 'tutti' || s.stato === filtroStato
@@ -774,18 +784,75 @@ export default function Home() {
                     {/* Sezione Condizioni */}
                     <div className="border-t pt-4">
                       <div className="space-y-3">
-                        <div className="bg-warning-50 border border-warning-200 rounded-lg p-4">
-                          <h4 className="font-medium text-warning-800 mb-2">📋 Condizioni di Utilizzo</h4>
-                          <div className="text-sm text-warning-700 space-y-2">
-                            <p><strong>Placeholder:</strong> Qui verranno inserite le condizioni complete:</p>
-                            <ul className="list-disc list-inside space-y-1 ml-2">
-                              <li>Trattamento dei dati personali secondo GDPR</li>
-                              <li>Finalità della raccolta dati</li>
-                              <li>Diritti dell'interessato</li>
-                              <li>Conservazione e sicurezza dei dati</li>
-                              <li>Condivisione con enti competenti</li>
-                            </ul>
-                            <p className="text-xs mt-2 italic">Le condizioni definitive sono in fase di redazione...</p>
+                      <div className="bg-warning-50 border border-warning-200 rounded-lg p-4 max-h-96 overflow-y-auto">
+                          <h4 className="font-medium text-warning-800 mb-2 sticky bottom-10 bg-warning-50 pb-2 z-10 shadow-sm">📋 Informativa sulla Privacy</h4>
+                          <div className="text-sm text-warning-700 space-y-3">
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">1. Titolare del trattamento</h5>
+                              <p className="text-xs">Il titolare del trattamento dei dati sono i Giovani Democratici di Civitavecchia, con sede in Civitavecchia (RM), Via Friuli 1, contattabili all'indirizzo e-mail giovanidemcv@gmail.com.</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">2. Tipologie di dati raccolti</h5>
+                              <p className="text-xs mb-1">Il sito può raccogliere e trattare le seguenti tipologie di dati personali:</p>
+                              <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
+                                <li>Dati di navigazione (es. indirizzo IP, tipo di browser, sistema operativo, dati relativi alla sessione e al dispositivo);</li>
+                                <li>Dati forniti volontariamente dall'utente (es. nome, cognome, indirizzo e-mail, eventuali messaggi inviati tramite moduli di contatto);</li>
+                                <li>Cookie tecnici e di sessione, necessari per il corretto funzionamento del sito (non vengono utilizzati cookie di profilazione o marketing).</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">3. Finalità e base giuridica del trattamento</h5>
+                              <p className="text-xs mb-1">I dati personali vengono trattati per le seguenti finalità:</p>
+                              <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
+                                <li>Gestire e rispondere alle richieste di contatto o informazioni inviate dagli utenti;</li>
+                                <li>Consentire la partecipazione ad attività e iniziative promosse dall'associazione;</li>
+                                <li>Garantire il corretto funzionamento e la sicurezza del sito;</li>
+                                <li>Adempiere a eventuali obblighi legali o regolamentari.</li>
+                              </ul>
+                              <p className="text-xs mt-1">Le basi giuridiche del trattamento sono il legittimo interesse del titolare alla gestione del sito e alla sicurezza dei sistemi (art. 6, par. 1, lett. f GDPR).</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">4. Modalità del trattamento</h5>
+                              <p className="text-xs">Il trattamento avviene mediante strumenti informatici e telematici, nel rispetto dei principi di liceità, correttezza, trasparenza e minimizzazione dei dati. Sono adottate misure tecniche e organizzative adeguate per garantire la riservatezza, l'integrità e la sicurezza dei dati personali.</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">5. Comunicazione e diffusione dei dati</h5>
+                              <p className="text-xs mb-1">I dati personali non saranno in alcun modo ceduti o venduti a terzi. Potranno essere comunicati esclusivamente a:</p>
+                              <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
+                                <li>Collaboratori o fornitori di servizi informatici strettamente necessari al funzionamento del sito (Vercel.com);</li>
+                                <li>Autorità pubbliche, nei soli casi previsti dalla legge o su loro richiesta.</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">6. Trasferimento dei dati all'estero</h5>
+                              <p className="text-xs">I dati non vengono trasferiti al di fuori dell'Unione Europea. Eventuali trasferimenti futuri avverranno nel rispetto delle garanzie previste dagli articoli 44 e seguenti del GDPR.</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">7. Periodo di conservazione dei dati</h5>
+                              <p className="text-xs">I dati saranno conservati per il tempo strettamente necessario a conseguire le finalità per cui sono stati raccolti e, comunque, non oltre 24 mesi dall'ultimo contatto con l'utente, salvo diversi obblighi di legge.</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">8. Diritti dell'interessato</h5>
+                              <p className="text-xs mb-1">L'utente può esercitare in qualsiasi momento i diritti previsti dagli articoli 15-22 del GDPR, tra cui:</p>
+                              <ul className="list-disc list-inside space-y-1 ml-2 text-xs">
+                                <li>diritto di accesso, rettifica, cancellazione ("oblio"), limitazione e opposizione al trattamento;</li>
+                                <li>diritto alla portabilità dei dati.</li>
+                              </ul>
+                              <p className="text-xs mt-1">Per esercitare tali diritti, è possibile scrivere a: giovanidemcv@gmail.com.</p>
+                              <p className="text-xs mt-1">L'utente ha inoltre il diritto di proporre reclamo al Garante per la Protezione dei Dati Personali (www.garanteprivacy.it).</p>
+                            </div>
+                            
+                            <div>
+                              <h5 className="font-semibold text-warning-800 mb-1">9. Aggiornamenti dell'informativa</h5>
+                              <p className="text-xs">I Giovani Democratici di Civitavecchia si riservano il diritto di modificare o aggiornare la presente informativa in qualsiasi momento, pubblicando la versione più recente sul sito.</p>
+                            </div>
                           </div>
                         </div>
                         
@@ -797,7 +864,7 @@ export default function Home() {
                           />
                           <div className="space-y-1">
                             <Label htmlFor="accept-terms" className="text-sm font-medium cursor-pointer">
-                              Accetto le condizioni di utilizzo *
+                              Accetto l'informativa sulla privacy *
                             </Label>
                             <p className="text-xs text-gray-600">
                               Obbligatorio per proseguire con l'inserimento di dati personali e foto
@@ -1013,7 +1080,10 @@ export default function Home() {
                       </div>
                       {getStatoIcon(segnalazione.stato)}
                     </div>
-                    <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
+                                     <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
+                      <Badge className={`text-xs ${getTipoColor(segnalazione.tipo)}`}>
+                        {segnalazione.tipo.replace(/_/g, ' ')}
+                      </Badge>
                       <Badge className={`text-xs ${getGravitaColor(segnalazione.gravita)}`}>
                         {segnalazione.gravita}
                       </Badge>

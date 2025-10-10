@@ -115,6 +115,7 @@
   --sidebar-accent-foreground: hsl(24, 68%, 25%);
   --sidebar-border: hsl(24, 20%, 88%);    /* Bordo leggero */
   --sidebar-ring: hsl(24, 68%, 45%);      /* Alloy Orange */
+  
 }
 
 .dark {
@@ -171,7 +172,54 @@
   .bg-brand {
     background-color: var(--brand-500);
   }
+  .border-danger-200 { border-color: #fecaca; }
+  .border-danger-700 { border-color: #b91c1c; }
   
+  /* Colori per tipi di segnalazione */
+  .bg-purple-50 { background-color: #faf5ff; }
+  .bg-purple-700 { background-color: #6b21a8; }
+  .text-purple-700 { color: #6b21a8; }
+  .border-purple-200 { border-color: #e9d5ff; }
+  
+  .bg-indigo-50 { background-color: #eef2ff; }
+  .bg-indigo-700 { background-color: #4338ca; }
+  .text-indigo-700 { color: #4338ca; }
+  .border-indigo-200 { border-color: #e0e7ff; }
+  
+  .bg-orange-50 { background-color: #fff7ed; }
+  .bg-orange-700 { background-color: #c2410c; }
+  .text-orange-700 { color: #c2410c; }
+  .border-orange-200 { border-color: #fed7aa; }
+  
+  .bg-pink-50 { background-color: #fdf2f8; }
+  .bg-pink-700 { background-color: #be185d; }
+  .text-pink-700 { color: #be185d; }
+  .border-pink-200 { border-color: #fbcfe8; }
+  
+  .bg-amber-50 { background-color: #fffbeb; }
+  .bg-amber-700 { background-color: #b45309; }
+  .text-amber-700 { color: #b45309; }
+  .border-amber-200 { border-color: #fde68a; }
+  
+  .bg-lime-50 { background-color: #f7fee7; }
+  .bg-lime-700 { background-color: #4d7c0f; }
+  .text-lime-700 { color: #4d7c0f; }
+  .border-lime-200 { border-color: #bef264; }
+  
+  .bg-teal-50 { background-color: #f0fdfa; }
+  .bg-teal-700 { background-color: #0f766e; }
+  .text-teal-700 { color: #0f766e; }
+  .border-teal-200 { border-color: #99f6e4; }
+  
+  .bg-cyan-50 { background-color: #ecfeff; }
+  .bg-cyan-700 { background-color: #0e7490; }
+  .text-cyan-700 { color: #0e7490; }
+  .border-cyan-200 { border-color: #a5f3fc; }
+  
+  .bg-slate-50 { background-color: #f8fafc; }
+  .bg-slate-700 { background-color: #334155; }
+  .text-slate-700 { color: #334155; }
+  .border-slate-200 { border-color: #e2e8f0; }
   .bg-brand-50 { background-color: var(--brand-50); }
   .bg-brand-100 { background-color: var(--brand-100); }
   .bg-brand-200 { background-color: var(--brand-200); }
