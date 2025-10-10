@@ -785,7 +785,7 @@ export default function Home() {
                     <div className="border-t pt-4">
                       <div className="space-y-3">
                       <div className="bg-warning-50 border border-warning-200 rounded-lg p-4 max-h-96 overflow-y-auto">
-                          <h4 className="font-medium text-warning-800 mb-2 sticky bottom-10 bg-warning-50 pb-2 z-10 shadow-sm">📋 Informativa sulla Privacy</h4>
+                          <h4 className="font-medium text-warning-800 mb-2 sticky bottom-10 bg-warning-50 pb-2 z-10">📋 Informativa sulla Privacy</h4>
                           <div className="text-sm text-warning-700 space-y-3">
                             <div>
                               <h5 className="font-semibold text-warning-800 mb-1">1. Titolare del trattamento</h5>
